@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+    <style>
+      .CodeMirror {
+        font-family: Arial, monospace;
+        font-size: 14px;
+        line-height: 13pt;
+        font-family: "Fira Code", monospace;
+        tab-size: 2;
+        white-space: pre-wrap;
+        overflow: auto;
+        border: solid;
+        border-color: #c0c0c0;
+      }
+
+      .CodeMirror pre.CodeMirror-placeholder {
+        color: #999;
+      }
+
+      div#father {
+        position: relative;
+      }
+
+      .container {
+        position: relative;
+        left: 0px;
+        padding: 0;
+        margin: 0;
+      }
+
+      .left-element {
+        float: left;
+      }
+
+      .right-element {
+        float: left;
+        padding-left: 10px;
+        width: 50%;
+      }
+
+      .switch {
+        position: relative;
+        display: inline-block;
+        width: 60px;
+        height: 34px;
+      }
+
+      .switch input {
+        opacity: 0;
+        width: 0;
+        height: 0;
+      }
+
+      .slider {
+        position: absolute;
+        cursor: pointer;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: #ccc;
+        -webkit-transition: 0.4s;
+        transition: 0.4s;
+        transform: scale(0.8); /* Equal to scaleX(0.7) scaleY(0.7) */
+      }
+
+      .slider:before {
+        position: absolute;
+        content: "";
+        height: 26px;
+        width: 26px;
+        left: 4px;
+        bottom: 4px;
+        background-color: white;
+        -webkit-transition: 0.4s;
+        transition: 0.4s;
+      }
+
+      input:checked + .slider {
+        background-color: #2196f3;
+      }
+
+      input:focus + .slider {
+        box-shadow: 0 0 1px #2196f3;
+      }
+
+      input:checked + .slider:before {
+        -webkit-transform: translateX(26px);
+        -ms-transform: translateX(26px);
+        transform: translateX(26px);
+      }
+
+      /* Rounded sliders */
+      .slider.round {
+        border-radius: 34px;
+      }
+
+      .slider.round:before {
+        border-radius: 50%;
+      }
+
+      .save button:active {
+        background-color: #3e8e41;
+      }
+
+      .save button {
+        background-color: rgba(43, 156, 62, 0.9); /* Green */
+        border: none;
+        color: white;
+        padding: 10px 32px;
+        text-align: center;
+        text-decoration: none;
+        font-size: 16px;
+        display: block;
+        margin-left: auto;
+        margin-right: auto;
+        width: 100%;
+      }
+
+      .tab button {
+        background-color: inherit;
+        display: inline;
+        border: none;
+        outline: none;
+        cursor: pointer;
+        padding: 8px 8px;
+        transition: 0.3s;
+        font-size: 14px;
+        width: auto;
+        color: black;
+      }
+
+      .container .btn2 {
+        padding: 5px 5px;
+        font-size: 14px;
+        position: relative;
+        left: 89%;
+
+        width: auto;
+      }
+
+      /* Change background color of buttons on hover */
+      .tab button:hover {
+        background-color: #ddd;
+      }
+
+      /* Create an active/current tablink class */
+      .tab button.active {
+        background-color: #ccc;
+      }
+
+      .tab {
+        overflow: hidden;
+        border: 1px solid #ccc;
+        background-color: rgba(240, 236, 233, 0.87);
+      }
+    </style>
+
+    <title>ReadX Extension Options</title>
+  </head>
+  <body id="body" style="visibility: hidden">
+    <div class="container">
+      <canvas id="c" style="width: 510px; height: 450px; position: absolute; z-index: -1"></canvas>
+      <div class="left-element" style="width: 520px">
+        <header>
+          <div style="width: 100%">
+            <span STYLE="font-size:18.0pt"><strong>ReadX </strong></span>
+            <span class="tab">
+              <button id="first" name="firstPage" class="tablinks active">Main</button>
+              <button id="second" name="secondPage" class="tablinks" style="display: none">Automation</button>
+            </span>
+            <label class="switch" style="float: right; margin-right: 7px">
+              <input type="checkbox" id="toggle" checked />
+              <span class="slider round"></span>
+            </label>
+          </div>
+        </header>
+
+        <div class="tabcontent" id="secondPage" style="display: none">
+          <div style="padding: 5px; background-color: rgba(240, 236, 233, 0.87)">
+            <span style="font-size: 15px">Select the <span class="page-elment" style="color: rgba(117, 76, 163, 0.87)">[Page Element]</span> for Spacebar to play by default:</span>
+            <div class="container">
+              <textarea
+                spellcheck="false"
+                name="text"
+                id="txtspacebartoplay"
+                cols="40"
+                rows="10"
+                style="resize: none; background-color: rgba(255, 255, 255, 0.87); width: 98.5%"
+              ></textarea>
+              <button class="btn2" name="spacetoplay" id="btnspacebartoplay">Select</button>
+            </div>
+          </div>
+          <div style="height: 5px"></div>
+          <div style="padding: 5px; background-color: rgba(240, 236, 233, 0.87)">
+            <span style="font-size: 15px"
+              >Select <span class="next-page-elment" style="color: rgba(117, 76, 163, 0.87)">[Next Page]</span> for Auto Play to press, after leaving
+              <span class="page-elment" style="color: rgba(117, 76, 163, 0.87)">[Page Element]</span>:</span
+            >
+            <div class="container">
+              <textarea
+                spellcheck="false"
+                name="text"
+                id="txtautoplay"
+                cols="40"
+                rows="10"
+                style="resize: none; background-color: rgba(255, 255, 255, 0.87); width: 98.5%"
+              ></textarea>
+              <button class="btn2" name="autoplay" id="btnautoplay">Select</button>
+            </div>
+          </div>
+        </div>
+        <div class="tabcontent" id="firstPage" style="display: block">
+          <div style="padding: 5px; background-color: rgba(240, 236, 233, 0.87)">
+            Current Voice:
+            <select id="voice"></select>
+            <br />
+            <span style="margin-right: 35px">Speed:</span>
+            <input type="range" id="speed" name="volume" step="10" min="50" max="200" />
+            <label type="span" id="mySpeedValue"></label>
+          </div>
+          <div>
+            <p></p>
+            <textarea spellcheck="false" name="text" id="replace" cols="40" rows="15" style="resize: none; background-color: rgba(255, 255, 255, 0.87); width: 98.5%"></textarea>
+          </div>
+          <div style="padding: 5px; background-color: rgba(240, 236, 233, 0.87)">
+            <input type="checkbox" id="rescan" />
+            <label for="rescan">Rescan page on read</label><br />
+            <div style="display: none">
+              <input type="checkbox" id="continous" />
+              <label for="continous">Continuous reading<span style="color: orange; font-weight: bold"> [Optimum]</span></label
+              ><br />
+            </div>
+
+            <input type="checkbox" id="slide" />
+            <label for="slide">Drag to read</label><br />
+
+            <div id="dragSizesDiv">
+              <input type="range" id="dragsize" name="dragsize" step="1" min="10" max="80" />
+              <label type="span" id="dragsizeValue">30</label>&nbsp&nbsp&nbsp
+
+              <div
+                id="draggula"
+                style="
+                  position: absolute;
+                  display: inline-block;
+                  opacity: 0.5;
+                  z-index: 1;
+                  background-color: rgb(33, 150, 243);
+                  text-align: center;
+                  border: 1px solid rgb(211, 211, 211);
+                  line-height: 30px;
+                  height: 30px;
+                  width: 30px;
+                  cursor: default;
+                  border-radius: 25%;
+                "
+              ></div>
+              <br />
+            </div>
+
+            <input type="checkbox" id="spacebar" />
+            <label for="spacebar">Spacebar to Play / Pause</label><br />
+
+            <div id="hidden">
+              <input type="checkbox" id="highlight" />
+              <label for="highlight">Highlight sentences</label><br />
+            </div>
+
+            <input type="checkbox" id="highlightonly" />
+            <label for="highlightonly">Yellow Highlight Only</label><br />
+
+            <input type="checkbox" id="autoscroll" />
+            <label for="autoscroll">Auto-scroll</label><br />
+
+            <input type="checkbox" id="click" />
+            <label for="click">Click to read</label>
+
+            <input type="radio" id="single" name="click type" value="single" checked />
+            <label for="huey">single</label>
+
+            <input type="radio" id="double" name="click type" value="double" />
+            <label for="dewey">double</label>
+            <br />
+          </div>
+        </div>
+
+        <div class="save">
+          <button id="save" style="margin-top: 7px">Save</button>
+        </div>
+        <div id="status"></div>
+      </div>
+
+      <div class="right-element">
+        <span style="font-size: 15px"
+          ><span style="font-size: 30px"><b>How to use</b></span>
+          <p>Refresh the page you want read, if you just installed this extension.</p>
+          <p>
+            You can also pin the extension to the top bar for added functions<br />
+            by clicking on the extensions button at the top right of the adress bar.
+          </p>
+
+          You can <span style="color: rgba(117, 76, 163, 0.87)">[double click]</span> on the text on a page for it to start reading from that point.<br />
+          Another option is to select text and press the <span style="color: rgba(117, 76, 163, 0.87)">[spacebar]</span> for it to play from that location.<br />
+          <p>
+            You can also click the <span style="color: rgba(117, 76, 163, 0.87)">[blue square]</span> on the bottom right to start reading from your selection<br />
+            or drag it to where you want to read from in case what you want to read is a link.<br />
+            <br />In iframes the blue square appears in the top right corner, clicking on it when nothing is selected will cause it to slide over for a few seconds.
+          </p>
+
+          <p>
+            Clicking on the <span style="color: rgba(117, 76, 163, 0.87)">[blue square]</span> or pressing the <span style="color: rgba(117, 76, 163, 0.87)">[spacebar]</span> also
+            toggles play/pause. <br />
+            <span style="color: rgba(117, 76, 163, 0.87)">[Single clicking]</span> anywhere on the page pauses the playback as well.
+          </p>
+
+          <p>*Some features may work differently inside iframes or Shadow DOM elements.</p>
+        </span>
+        <h1>How to replace spoken words</h1>
+        <span style="font-size: 15px">
+          <p>You can replace a single word or multiple words at once.</p>
+          <p>
+            To replace a single word, you can either write word<span style="color: rgba(25, 36, 192, 0.87)">=></span>replacewith <br />You can also use RegEx which uses a regular
+            expression. <br />Both of these methods are not case sensitive
+          </p>
+          <p>
+            Another option is Erase=> which accepts regEx input and erases anything it finds<br />
+            This for example will stop URLs from being read: <span style="color: rgba(25, 36, 192, 0.87)">Erase=>http(?:s)?:\/\/[^\s]*[^ .]=>igm</span><br />
+            <br />The erase function gets called after all others and is not limited in scope to single elements.
+          </p>
+        </span>
+
+        <h1>Domain specific settings example</h1>
+
+        
+        <span style="font-size: 15px">
+          pressing ctrl+space in the replace textbox will bring up a list of all available commands<br /><br />
+          Set a different voice for each domain (does not need to be the entire name)<br />
+          <span style="color: blue">#voice:</span> Name<br />
+          <br />
+          Set next and last 'paragraph' shortcut keys<br />
+          In this example the + shift is written for clarity, and is not required<br />
+          <span style="color: blue">#lastParagraphShortcutKey:</span><span style="color: rgb(14, 2, 2)"> ctrl + shift + &lt;</span><br />
+          <span style="color: blue">#nextParagraphShortcutKey:</span><span style="color: rgb(0, 0, 0)"> ctrl + shirt + &gt;</span><br />
+          <span style="color: blue">#playPauseShortcutKey:</span><span style="color: rgb(0, 0, 0)"> ctrl + Space </span><br /><br />
+
+
+          Set a list of voices you want the program to use when reading multiple commnets<br />
+          <span style="color: blue">#listOfvoices:</span> Voice1, Voice2<br />
+          <span style="color: blue">#listOfLocales:</span> Country1, Country2<br /><br />
+          -------------------------------<br />
+          The following reads comments using different voices on reddit.<br /><br />
+          <span style="color: purple">#domain:www.reddit.com</span><br />
+          <span style="color: blue">#attributeName:</span>data-testid<br />
+          <span style="color: blue">#attributeValue:</span>comment_author_link<br />
+          <br />
+          <span style="color: blue">#removeNicknames:</span>no<br />
+          <span style="color: blue">#dynamicContent:</span>no<br />
+          <span style="color: green">erase</span><span style="color: orange">=></span>^level \d{1,2}<span style="color: orange">=></span>gm<br />
+          <span style="color: green">erase</span><span style="color: orange">=></span>.+Report Save Follow<span style="color: orange">=></span>gmi<br />
+          <span style="color: green">erase</span><span style="color: orange">=></span>(?<=ApplyVoiceChange:.+)(?<=\.\.\.).+<span style="color: orange">=></span>g<br />
+          <br />
+
+          <span style="color: rgb(173, 168, 168)">// For classic reddit, ApplyVoiceChange:o removes nickname, ApplyVoiceChange:x keeps it </span><br />
+          [–]<span style="color: orange">=></span>ApplyVoiceChange:o<br />
+          <span style="color: green">erase</span><span style="color: orange">=></span>\d{1,3} Reply Give Award Share<span style="color: orange">=></span>g<br />
+          <span style="color: green">RegEx</span>=>level \d{1,2}=><br />
+          <span style="color: green">erase</span><span style="color: orange">=></span>(?<=ApplyVoiceChange:. [_\[A-Za-z\0-9\-].+) .+<span style="color: orange">=></span>g<br />
+          <span style="color: green">erase</span><span style="color: orange">=></span>permalink embed save (?:parent )?report give award reply<span style="color: orange">=></span>gmi<br />
+          <br />
+          <span style="color: purple">#domain:all</span><br /><br />
+        </span>
+      </div>
+    </div>
+    <script src="lib/codemirror.js"></script>
+    <link rel="stylesheet" href="lib/fold/foldgutter.css" />
+    <link rel="stylesheet" href="lib/codemirror.css" />
+    <link rel="stylesheet" href="hint/show-hint.css" />
+    <script src="lib/javascript.js"></script>
+
+    <script src="lib/fold/foldcode.js"></script>
+    <script src="lib/fold/foldgutter.js"></script>
+    <script src="lib/fold/brace-fold.js"></script>
+    <script src="lib/fold/xml-fold.js"></script>
+    <script src="lib/fold/indent-fold.js"></script>
+    <script src="lib/fold/markdown-fold.js"></script>
+    <script src="lib/fold/comment-fold.js"></script>
+    <script src="lib/placeholder.js"></script>
+
+    <script src="hint/show-hint.js"></script>
+    <script src="hint/javascript-hint.js"></script>
+
+    <script src="options.js"></script>
+  </body>
+</html>

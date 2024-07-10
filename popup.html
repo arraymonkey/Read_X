@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+    <style>
+      /* start of text input style */
+
+        .CodeMirror {
+        font-family: Arial, monospace;
+        font-size: 14px;
+        line-height: 13pt;
+        font-family: "Fira Code", monospace;
+        tab-size: 2;
+        white-space: pre-wrap;
+        overflow: auto;
+        border: solid;
+        border-color: #c0c0c0
+        }
+        .CodeMirror pre.CodeMirror-placeholder { color: #999; }
+
+        
+      #replace,
+      #highlighting {
+        /* Both elements need the same text and space styling so they are directly on top of each other */
+        margin: 1px;
+        padding: 10px;
+        width: 95%;
+        height: 220px;
+      }
+      #replace,
+      #highlighting,
+      #highlighting * {
+        /* Also add text styles to highlighing tokens */
+        font-size: 11pt;
+        font-family: monospace;
+        line-height: 13pt;
+        tab-size: 2;
+      }
+
+      div#father {
+        position: relative;
+        height: 235px;
+      }
+
+      #replace,
+      #highlighting {
+        /* In the same place */
+        position: absolute;
+        top: 0;
+        left: 0;
+      }
+
+      /* Move the textarea in front of the result */
+
+      #replace {
+        z-index: 1;
+      }
+      #highlighting {
+        z-index: 0;
+        background: rgba(255, 255, 255, 0.87);
+      }
+
+      /* Make textarea almost completely transparent */
+
+      #replace {
+        color: black;
+        background: rgba(255, 255, 255, 0.87);
+        caret-color: black; /* Or choose your favourite color */
+      }
+
+      /* Can be scrolled */
+      #replace,
+      #highlighting {
+        overflow: auto;
+        white-space: pre-wrap; /* Allows textarea to scroll horizontally */
+      }
+
+      /* No resize on textarea */
+      #replace {
+        resize: none;
+      }
+
+      /* Paragraphs; First Image */
+      #replace,
+      #highlighting {
+        font-family: "Fira Code", monospace;
+      }
+      p code {
+        border-radius: 2px;
+        background-color: #eee;
+        color: #111;
+      }
+
+      code[class*="language-"],
+      pre[class*="language-"] {
+        font-family: Consolas, Monaco, "Andale Mono", "Ubuntu Mono", monospace;
+        font-size: 1em;
+        text-align: left;
+        white-space: pre-wrap;
+        word-spacing: normal;
+        word-break: normal;
+        word-wrap: normal;
+        overflow-wrap: break-word;
+        line-height: 1.5;
+
+        -moz-tab-size: 4;
+        -o-tab-size: 4;
+        tab-size: 4;
+
+        -webkit-hyphens: none;
+        -moz-hyphens: none;
+        -ms-hyphens: none;
+        hyphens: none;
+      }
+
+      /* Code blocks */
+      pre[class*="language-"] {
+        padding: 0.4em 0.8em;
+        margin: 0.5em 0;
+        overflow: auto;
+        background: white; /* - WebCoder49 */
+      }
+
+      code[class*="language-"] {
+        background: white;
+        color: black;
+        /*box-shadow: -.3em 0 0 .3em black, .3em 0 0 .3em black;*/
+      }
+
+      /* Inline code */
+      :not(pre) > code[class*="language-"] {
+        padding: 0.2em;
+        border-radius: 0.3em;
+        box-shadow: none;
+        white-space: normal;
+      }
+
+      /* end of text input style */
+
+      .switch {
+        position: relative;
+        display: inline-block;
+        width: 60px;
+        height: 34px;
+      }
+
+      .switch input {
+        opacity: 0;
+        width: 0;
+        height: 0;
+      }
+
+      .slider {
+        position: absolute;
+        cursor: pointer;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: #ccc;
+        -webkit-transition: 0.4s;
+        transition: 0.4s;
+        transform: scale(0.8); /* Equal to scaleX(0.7) scaleY(0.7) */
+      }
+
+      .slider:before {
+        position: absolute;
+        content: "";
+        height: 26px;
+        width: 26px;
+        left: 4px;
+        bottom: 4px;
+        background-color: white;
+        -webkit-transition: 0.4s;
+        transition: 0.4s;
+      }
+
+      input:checked + .slider {
+        background-color: #2196f3;
+      }
+
+      input:focus + .slider {
+        box-shadow: 0 0 1px #2196f3;
+      }
+
+      input:checked + .slider:before {
+        -webkit-transform: translateX(26px);
+        -ms-transform: translateX(26px);
+        transform: translateX(26px);
+      }
+
+      /* Rounded sliders */
+      .slider.round {
+        border-radius: 34px;
+      }
+
+      .slider.round:before {
+        border-radius: 50%;
+      }
+
+      .save button:active {
+        background-color: #3e8e41;
+      }
+
+      .save button {
+        background-color: rgba(43, 156, 62, 0.9); /* Green */
+        border: none;
+        color: white;
+        padding: 10px 32px;
+        text-align: center;
+        text-decoration: none;
+        font-size: 16px;
+        display: block;
+        margin-left: auto;
+        margin-right: auto;
+        width: 100%;
+      }
+
+      .tab button {
+        background-color: inherit;
+        display: inline;
+        border: none;
+        outline: none;
+        cursor: pointer;
+        padding: 8px 8px;
+        transition: 0.3s;
+        font-size: 14px;
+        width: auto;
+        color: black;
+      }
+
+      .container .btn2 {
+        padding: 5px 5px;
+        font-size: 14px;
+        position: relative;
+        left: 89%;
+
+        width: auto;
+      }
+
+      .container .btn3 {
+        padding: 5px 5px;
+        font-size: 14px;
+        position: relative;
+        left: 78%;
+
+        width: auto;
+      }
+
+      .container .btn4 {
+        padding: 5px 5px;
+        font-size: 14px;
+        position: relative;
+        left: 78.5%;
+
+        width: auto;
+      }
+
+      /* Change background color of buttons on hover */
+      .tab button:hover {
+        background-color: #ddd;
+      }
+
+      /* Create an active/current tablink class */
+      .tab button.active {
+        background-color: #ccc;
+      }
+
+      .tab {
+        overflow: hidden;
+        border: 1px solid #ccc;
+        background-color: rgba(240, 236, 233, 0.87);
+      }
+    </style>
+
+    <title>ReadX Extension Options</title>
+  </head>
+  <body id="body" style="visibility: visible">
+    <canvas id="c" style="width: 510px; height: 560px; position: fixed; z-index: -1"></canvas>
+    <div style="width: 520px">
+      <header>
+        <div style="width: 100%">
+          <span STYLE="font-size:18.0pt"><strong>ReadX </strong></span>
+          <span class="tab">
+            <button id="first" name="firstPage" class="tablinks active">Main</button>
+            <button id="second" name="secondPage" class="tablinks">Automation</button>
+            <button id="third" name="thirdPage" class="tablinks">Blacklist</button>
+            <button id="fourth" name="fourthPage" class="tablinks">Extra</button>
+            <label id="status" style="font-size: 10pt; right: 10px; bottom: 10px; position: absolute; margin-top: 10px"></label>
+          </span>
+          <label class="switch" style="float: right; margin-right: 7px">
+            <input type="checkbox" id="toggle" checked />
+            <span class="slider round"></span>
+          </label>
+        </div>
+      </header>
+
+      <div class="tabcontent" id="fourthPage" style="display: none">
+        <div style="padding: 5px; background-color: rgba(240, 236, 233, 0.87)">
+          <span style="font-size: 15px">Read text from ID location</span>
+          <div class="container">
+            <span style="font-size: 15px">ID: </span><input type="text" id="handleid" name="handleid" maxlength="4" size="4" STYLE="margin-bottom:8px; margin-top:8px" >
+            <span style="font-size: 15px">Contains Words: </span><input type="text" id="startingwords" name="startingwords" STYLE="margin-bottom:8px; margin-top:8px" >
+
+            <textarea spellcheck="false" name="text" id="scanresults" cols="40" rows="10" style="resize: none; background-color: rgba(255, 255, 255, 0.87); width: 98.5%"></textarea>
+            <button class="btn4" name="Send Message to Tabs" id="btnSendMessage">Refresh / Send</button>
+         
+          </div>  
+        </div>
+        <div style="height: 5px"></div>
+      </div>
+
+      <div class="tabcontent" id="thirdPage" style="display: none">
+        <div style="padding: 5px; background-color: rgba(240, 236, 233, 0.87)">
+          <span style="font-size: 15px">Add <span class="web-page-elment" style="color: rgba(117, 76, 163, 0.87)">[Web Pages]</span> on which this extension is not loaded:</span>
+          <div class="container">
+            <textarea spellcheck="false" name="text" id="blacklist" cols="40" rows="10" style="resize: none; background-color: rgba(255, 255, 255, 0.87); width: 98.5%"></textarea>
+            <button class="btn3" name="addtoblacklist" id="btnblacklist">Add to Blacklist</button>
+          </div>
+        </div>
+        <div style="height: 5px"></div>
+      </div>
+
+      <div class="tabcontent" id="secondPage" style="display: none">
+        <div style="padding: 5px; background-color: rgba(240, 236, 233, 0.87)">
+          <span style="font-size: 15px">Select the <span class="page-elment" style="color: rgba(117, 76, 163, 0.87)">[Page Element]</span> for Spacebar to play by default:</span>
+          <div class="container">
+            <textarea
+              spellcheck="false"
+              name="text"
+              id="txtspacebartoplay"
+              cols="40"
+              rows="10"
+              style="resize: none; background-color: rgba(255, 255, 255, 0.87); width: 98.5%"
+            ></textarea>
+            <button class="btn2" name="spacetoplay" id="btnspacebartoplay">Select</button>
+          </div>
+        </div>
+        <div style="height: 5px"></div>
+        <div style="padding: 5px; background-color: rgba(240, 236, 233, 0.87)">
+          <span style="font-size: 15px"
+            >Select <span class="next-page-elment" style="color: rgba(117, 76, 163, 0.87)">[Next Page]</span> for Auto Play to press, after leaving
+            <span class="page-elment" style="color: rgba(117, 76, 163, 0.87)">[Page Element]</span>:</span
+          >
+          <div class="container">
+            <textarea
+              spellcheck="false"
+              name="text"
+              id="txtautoplay"
+              cols="40"
+              rows="10"
+              style="resize: none; background-color: rgba(255, 255, 255, 0.87); width: 98.5%"
+            ></textarea>
+            <button class="btn2" name="autoplay" id="btnautoplay">Select</button>
+          </div>
+        </div>
+      </div>
+      <div class="tabcontent" id="firstPage" style="display: block">
+        <div style="padding: 5px; background-color: rgba(240, 236, 233, 0.87)">
+          Current Voice:
+          <select id="voice"></select>
+          <br />
+          <span style="margin-right: 35px">Speed:</span>
+          <input type="range" id="speed" name="volume" step="10" min="50" max="200" />
+          <label type="span" id="mySpeedValue"></label>
+        </div>
+        <p></p>
+        <div id="father">
+          <div style="height: 200px">
+            <textarea spellcheck="false" name="text" id="replace">
+            </textarea>
+        </div>
+
+        <div style="padding: 5px; background-color: rgba(240, 236, 233, 0.87)">
+          <input type="checkbox" id="rescan" />
+          <label for="rescan">Rescan page on read</label><br />
+          <div style="display: none">
+            <input type="checkbox" id="continous" />
+            <label for="continous">Continuous reading<span style="color: orange; font-weight: bold"> [Optimum]</span></label
+            ><br />
+          </div>
+          <input type="checkbox" id="slide" />
+          <label for="slide">Drag to read</label><br />
+
+          <div id="dragSizesDiv">
+            <input type="range" id="dragsize" name="dragsize" step="1" min="10" max="80" />
+            <label type="span" id="dragsizeValue">30</label>&nbsp&nbsp&nbsp
+
+            <div
+              id="draggula"
+              style="
+                position: absolute;
+                display: inline-block;
+                opacity: 0.5;
+                z-index: 1;
+                background-color: rgb(33, 150, 243);
+                text-align: center;
+                border: 1px solid rgb(211, 211, 211);
+                line-height: 30px;
+                height: 30px;
+                width: 30px;
+                cursor: default;
+                border-radius: 25%;
+              "
+            ></div>
+            <br />
+          </div>
+
+          <input type="checkbox" id="spacebar" />
+          <label for="spacebar">Spacebar to Play / Pause</label><br />
+
+          <div id="hidden">
+            <input type="checkbox" id="highlight" />
+            <label for="highlight">Highlight sentences</label><br />
+          </div>
+
+          <input type="checkbox" id="highlightonly" />
+          <label for="highlightonly">Yellow Highlight Only</label><br />
+
+          <input type="checkbox" id="autoscroll" />
+          <label for="autoscroll">Auto-scroll</label><br />
+
+          <input type="checkbox" id="click" />
+          <label for="click">Click to read</label>
+          <span id="clicktype">
+            <input type="radio" id="single" name="click type" value="single" checked />
+            <label for="single">single</label>
+
+            <input type="radio" id="double" name="click type" value="double" />
+            <label for="double">double</label>
+          </span>
+
+          <br />
+        </div>
+      </div>
+
+      <div class="save">
+        <button id="save" style="margin-top: 7px">Save</button>
+      </div>
+    </div>
+
+    <script src="lib/codemirror.js"></script>
+    <link rel="stylesheet" href="lib/fold/foldgutter.css" />
+    <link rel="stylesheet" href="lib/codemirror.css" />
+    <link rel="stylesheet" href="hint/show-hint.css">
+    <script src="lib/javascript.js"></script>
+    
+  
+    <script src="lib/fold/foldcode.js"></script>
+    <script src="lib/fold/foldgutter.js"></script>
+    <script src="lib/fold/brace-fold.js"></script>
+    <script src="lib/fold/xml-fold.js"></script>
+    <script src="lib/fold/indent-fold.js"></script>
+    <script src="lib/fold/markdown-fold.js"></script>
+    <script src="lib/fold/comment-fold.js"></script>
+    <script src="lib/placeholder.js"></script>
+
+    <script src="hint/show-hint.js"></script>
+    <script src="hint/javascript-hint.js"></script>
+    
+
+    <script src="popup.js"></script>
+  </body>
+</html>

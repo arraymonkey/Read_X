@@ -1,0 +1,47 @@
+{
+   "action": {
+      "default_popup": "popup.html"
+   },
+   "background": {
+      "service_worker": "background.js"
+   },
+   "commands": {
+      "activateextension": {
+         "description": "Activate the extension",
+         "suggested_key": {
+            "default": "Ctrl+R"
+         }
+      }
+   },
+   "content_scripts": [ {
+      "all_frames": true,
+      "js": [ "content.js" ],
+      "match_about_blank": true,
+      "matches": [ "\u003Call_urls>" ]
+   } ],
+   "description": "Text to speech Extension",
+   "icons": {
+      "128": "images/get_started128.png",
+      "16": "images/get_started16.png",
+      "32": "images/get_started32.png",
+      "48": "images/get_started48.png"
+   },
+   "key": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA3ZUyvUbaJER/sIRqwLz0+PPiLHPUWjx4su0v4Mw3g3Ee0OWaRfdK/iXynVh1oDPiBO6neOhO17Xw+iXiLc/9T3oOIKCSd8NJok4NNyQCU7xPuXF7osrCQFO4Vk8LW8oxaOHDYBVOXAlUmnPX3lTFF2/LfW5uC/pzBv7Qh/aJTVUb5KZha8obDgT9vd4kyr9sC5Q2a4EbKcUCqcP/UhCKKUND3LRnHHpPz0DOv7DIAdW/ezmdZoN9idA+IiRP5RX7qJ32SrDU7tFeS2l8MRe7012Geo+sTeS8mBsYLJUXEEHlWunpM7RLZlktCemgGJHhGMgf7UMP+Mb5PMzpzEJEgQIDAQAB",
+   "manifest_version": 3,
+   "name": "ReadX Text To Speech",
+   "options_page": "options.html",
+   "permissions": [ "activeTab", "storage", "background", "webNavigation", "tabs", "ttsEngine", "tts" ],
+   "tts_engine": {
+      "voices": [ {
+         "event_types": [ "start", "marker", "end" ],
+         "lang": "en-US",
+         "voice_name": "Alice"
+      }, {
+         "event_types": [ "end" ],
+         "lang": "en-US",
+         "voice_name": "Pat"
+      } ]
+   },
+   "update_url": "https://edge.microsoft.com/extensionwebstorebase/v1/crx",
+   "version": "1.1.4"
+}
